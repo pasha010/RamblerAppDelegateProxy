@@ -52,18 +52,17 @@
     }
 }
 
-- (void)addAppDelegates:(NSArray *)delegates {
-    for (id delegate in delegates) {
+- (void)addAppDelegates:(NSArray<id <UIApplicationDelegate>> *)delegates {
+    for (id <UIApplicationDelegate> delegate in delegates) {
         [self addAppDelegate:delegate];
     }
 }
 
 - (BOOL)respondsToSelector:(SEL)selector {
-    
     if ([self shouldForwardToSelf:selector]) {
         return YES;
     }
-    
+
     if ([self shouldForwardToDelegatesSelector:selector]) {
         for (id target in self.delegates) {
             if ([target respondsToSelector:selector]) {
@@ -71,7 +70,7 @@
             }
         }
     }
-    
+
     return [self.defaultAppDelegate respondsToSelector:selector];
 }
 
@@ -80,15 +79,14 @@
 }
 
 - (void)forwardInvocation:(NSInvocation *)invocation {
-    
     SEL selector = [invocation selector];
-    
+
     if ([self shouldForwardToSelf:selector]) {
         [invocation invokeWithTarget:self];
     }
-    
+
     BOOL hasResponder = NO;
-    
+
     if ([self shouldForwardToDelegatesSelector:selector]) {
         for (id target in self.delegates) {
             if ([target respondsToSelector:selector]) {
@@ -97,37 +95,35 @@
             }
         }
     }
-    
+
     if (hasResponder) return;
     [invocation invokeWithTarget:self.defaultAppDelegate];
 }
 
 - (BOOL)shouldForwardToDelegatesSelector:(SEL)selector {
-    
     if ([self isSelector:selector fromProtocol:@protocol(UIApplicationDelegate)] && ![self isSelector:selector fromProtocol:@protocol(NSObject)]) {
         return YES;
     }
-    
+
     return NO;
 }
 
 - (BOOL)isSelector:(SEL)selector fromProtocol:(Protocol *)protocol {
-    
     static BOOL isReqVals[4] = {NO, NO, YES, YES};
     static BOOL isInstanceVals[4] = {NO, YES, NO, YES};
     struct objc_method_description methodDescription;
-    
+
     for(int i = 0; i < 4; i++) {
         methodDescription = protocol_getMethodDescription(protocol,
                                                           selector,
                                                           isReqVals[i],
                                                           isInstanceVals[i]);
-        
+
         if(methodDescription.types != NULL && methodDescription.name != NULL){
             return YES;
         }
     }
-    
+
     return NO;
 }
 

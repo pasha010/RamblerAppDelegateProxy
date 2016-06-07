@@ -31,8 +31,8 @@
  
  Add an array of <UIApplicationDelegate> for forwarding UIApplicationDelegate methods.
  
- @param delegates Array of <UIApplicationDelegate> objects
+ @param delegates Array of id <UIApplicationDelegate> objects
  */
-- (void)addAppDelegates:(NSArray<UIApplicationDelegate> *)delegates;
+- (void)addAppDelegates:(NSArray<id <UIApplicationDelegate>> *)delegates;
 
 @end
